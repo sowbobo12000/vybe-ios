@@ -1,0 +1,96 @@
+default_platform(:ios)
+
+platform :ios do
+  # ── Build ──
+
+  desc "Build debug app"
+  lane :build_debug do
+    build_app(
+      scheme: "vybe",
+      configuration: "Debug",
+      export_method: "development",
+      skip_codesigning: true,
+      derived_data_path: "build/DerivedData",
+      output_directory: "build/Debug"
+    )
+  end
+
+  desc "Build release app"
+  lane :build_release do
+    build_app(
+      scheme: "vybe",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "build/Release",
+      output_name: "vybe.ipa"
+    )
+  end
+
+  # ── Testing ──
+
+  desc "Run unit tests"
+  lane :test do
+    run_tests(
+      scheme: "vybeTests",
+      device: "iPhone 16 Pro",
+      clean: true,
+      code_coverage: true,
+      output_directory: "build/test_results",
+      result_bundle: true
+    )
+  end
+
+  # ── Code Signing ──
+
+  desc "Sync certificates and provisioning profiles"
+  lane :sync_certs do
+    match(
+      type: "appstore",
+      app_identifier: "com.vybe.app",
+      readonly: true
+    )
+  end
+
+  desc "Sync development certificates"
+  lane :sync_certs_dev do
+    match(
+      type: "development",
+      app_identifier: "com.vybe.app",
+      readonly: true
+    )
+  end
+
+  # ── Deploy ──
+
+  desc "Deploy to TestFlight"
+  lane :beta do
+    sync_certs
+    increment_build_number
+    build_release
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  desc "Deploy to App Store"
+  lane :release do
+    sync_certs
+    increment_build_number
+    build_release
+    upload_to_app_store(
+      force: true,
+      submit_for_review: false
+    )
+  end
+
+  # ── Utilities ──
+
+  desc "Lint Swift code"
+  lane :lint do
+    swiftlint(
+      mode: :lint,
+      config_file: ".swiftlint.yml",
+      raise_if_swiftlint_error: true
+    )
+  end
+end
