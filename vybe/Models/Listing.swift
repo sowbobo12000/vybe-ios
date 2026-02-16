@@ -53,7 +53,7 @@ enum ListingCategory: String, Codable, CaseIterable, Sendable {
 }
 
 @Model
-final class Listing: @unchecked Sendable {
+final class Listing {
     @Attribute(.unique) var id: String
     var title: String
     var itemDescription: String

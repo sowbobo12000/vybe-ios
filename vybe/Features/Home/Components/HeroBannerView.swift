@@ -106,9 +106,11 @@ struct HeroBannerView: View {
     // MARK: - Auto Scroll
 
     private func startAutoScroll() {
-        timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: true) { _ in
-            withAnimation(.easeInOut(duration: 0.5)) {
-                currentIndex = (currentIndex + 1) % max(listings.count, 1)
+        timer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: true) { [self] _ in
+            Task { @MainActor in
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    currentIndex = (currentIndex + 1) % max(listings.count, 1)
+                }
             }
         }
     }
