@@ -4,6 +4,8 @@ import SwiftData
 /// The main entry point for the vybe marketplace app.
 @main
 struct vybeApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     @State private var router = AppRouter()
     @State private var authManager = AuthManager.shared
     @State private var themeManager = ThemeManager.shared

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// A styled text input field for the vybe design system.
 struct VybeTextField: View {

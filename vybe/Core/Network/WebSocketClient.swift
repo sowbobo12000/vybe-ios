@@ -1,11 +1,12 @@
 import Foundation
 
 /// A delegate protocol for receiving WebSocket events.
-protocol WebSocketClientDelegate: AnyObject, Sendable {
-    @MainActor func webSocketDidConnect()
-    @MainActor func webSocketDidDisconnect(error: Error?)
-    @MainActor func webSocketDidReceiveMessage(_ message: Message)
-    @MainActor func webSocketDidReceiveTypingIndicator(userID: String, conversationID: String, isTyping: Bool)
+@MainActor
+protocol WebSocketClientDelegate: AnyObject {
+    func webSocketDidConnect()
+    func webSocketDidDisconnect(error: Error?)
+    func webSocketDidReceiveMessage(_ message: Message)
+    func webSocketDidReceiveTypingIndicator(userID: String, conversationID: String, isTyping: Bool)
 }
 
 /// A WebSocket client for real-time chat messaging.
@@ -18,7 +19,7 @@ actor WebSocketClient {
     private var reconnectAttempts = 0
     private let maxReconnectAttempts = 5
 
-    weak var delegate: WebSocketClientDelegate?
+    nonisolated(unsafe) weak var delegate: WebSocketClientDelegate?
 
     private init() {}
 

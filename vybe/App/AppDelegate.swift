@@ -7,7 +7,6 @@ final class AppDelegate: NSObject, UIApplicationDelegate, @unchecked Sendable {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-        // Request notification permission
         UNUserNotificationCenter.current().delegate = self
         requestNotificationPermission()
         return true
@@ -18,7 +17,6 @@ final class AppDelegate: NSObject, UIApplicationDelegate, @unchecked Sendable {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        // Send token to backend for push notifications
         print("[vybe] APNs device token: \(token)")
     }
 
@@ -47,13 +45,12 @@ final class AppDelegate: NSObject, UIApplicationDelegate, @unchecked Sendable {
 
 // MARK: - UNUserNotificationCenterDelegate
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
+extension AppDelegate: @preconcurrency UNUserNotificationCenterDelegate {
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        // Show notification banner even when app is in foreground
         completionHandler([.banner, .badge, .sound])
     }
 
@@ -64,10 +61,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     ) {
         let userInfo = response.notification.request.content.userInfo
 
-        // Handle notification tap — route to appropriate screen
         if let deepLink = userInfo["deepLink"] as? String,
            let url = URL(string: deepLink) {
-            // Post to handle via onOpenURL in SwiftUI
             Task { @MainActor in
                 UIApplication.shared.open(url)
             }

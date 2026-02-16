@@ -2,7 +2,7 @@ import Foundation
 
 /// A type-safe wrapper around UserDefaults for non-sensitive app preferences.
 enum UserDefaultsManager {
-    private static let defaults = UserDefaults.standard
+    nonisolated(unsafe) private static let defaults = UserDefaults.standard
 
     // MARK: - Onboarding
 

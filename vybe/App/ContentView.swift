@@ -13,16 +13,45 @@ struct ContentView: View {
         ZStack(alignment: .bottom) {
             // Tab Content
             TabView(selection: $router.selectedTab) {
-                homeTab
-                    .tag(AppRouter.Tab.home)
-                searchTab
-                    .tag(AppRouter.Tab.search)
-                chatTab
-                    .tag(AppRouter.Tab.chat)
-                communitiesTab
-                    .tag(AppRouter.Tab.communities)
-                profileTab
-                    .tag(AppRouter.Tab.profile)
+                NavigationStack(path: $router.homePath) {
+                    HomeView()
+                        .navigationDestination(for: Route.self) { route in
+                            destinationView(for: route)
+                        }
+                }
+                .tag(AppRouter.Tab.home)
+
+                NavigationStack(path: $router.searchPath) {
+                    SearchView()
+                        .navigationDestination(for: Route.self) { route in
+                            destinationView(for: route)
+                        }
+                }
+                .tag(AppRouter.Tab.search)
+
+                NavigationStack(path: $router.chatPath) {
+                    ConversationsView()
+                        .navigationDestination(for: Route.self) { route in
+                            destinationView(for: route)
+                        }
+                }
+                .tag(AppRouter.Tab.chat)
+
+                NavigationStack(path: $router.communityPath) {
+                    CommunitiesView()
+                        .navigationDestination(for: Route.self) { route in
+                            destinationView(for: route)
+                        }
+                }
+                .tag(AppRouter.Tab.communities)
+
+                NavigationStack(path: $router.profilePath) {
+                    ProfileView()
+                        .navigationDestination(for: Route.self) { route in
+                            destinationView(for: route)
+                        }
+                }
+                .tag(AppRouter.Tab.profile)
             }
             .toolbar(.hidden, for: .tabBar)
 
@@ -37,53 +66,6 @@ struct ContentView: View {
             NavigationStack {
                 CreateListingView()
             }
-        }
-    }
-
-    // MARK: - Tab Views
-
-    private var homeTab: some View {
-        NavigationStack(path: $router.homePath) {
-            HomeView()
-                .navigationDestination(for: Route.self) { route in
-                    destinationView(for: route)
-                }
-        }
-    }
-
-    private var searchTab: some View {
-        NavigationStack(path: $router.searchPath) {
-            SearchView()
-                .navigationDestination(for: Route.self) { route in
-                    destinationView(for: route)
-                }
-        }
-    }
-
-    private var chatTab: some View {
-        NavigationStack(path: $router.chatPath) {
-            ConversationsView()
-                .navigationDestination(for: Route.self) { route in
-                    destinationView(for: route)
-                }
-        }
-    }
-
-    private var communitiesTab: some View {
-        NavigationStack(path: $router.communityPath) {
-            CommunitiesView()
-                .navigationDestination(for: Route.self) { route in
-                    destinationView(for: route)
-                }
-        }
-    }
-
-    private var profileTab: some View {
-        NavigationStack(path: $router.profilePath) {
-            ProfileView()
-                .navigationDestination(for: Route.self) { route in
-                    destinationView(for: route)
-                }
         }
     }
 
@@ -143,7 +125,6 @@ struct ContentView: View {
     private func tabButton(for tab: AppRouter.Tab) -> some View {
         Button {
             if router.selectedTab == tab {
-                // Tap same tab = pop to root
                 router.popToRoot()
             } else {
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -166,7 +147,6 @@ struct ContentView: View {
             .padding(.vertical, VybeSpacing.xxs)
         }
         .overlay(alignment: .topTrailing) {
-            // Unread badge for chat tab
             if tab == .chat {
                 let unreadCount = MockData.conversations.reduce(0) { $0 + $1.unreadCount }
                 if unreadCount > 0 {

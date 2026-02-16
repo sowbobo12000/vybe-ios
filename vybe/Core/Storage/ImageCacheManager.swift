@@ -1,4 +1,4 @@
-import SwiftUI
+import UIKit
 
 /// An in-memory and disk image cache for listing and user images.
 actor ImageCacheManager {
