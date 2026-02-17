@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// A fullscreen-width image carousel with page indicators and zoom support.
+/// Uses ScrollView with paging instead of TabView to avoid blocking vertical scroll.
 struct ImageCarouselView: View {
     let imageURLs: [String]
     @State private var currentIndex = 0
@@ -8,33 +9,49 @@ struct ImageCarouselView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            TabView(selection: $currentIndex) {
-                ForEach(Array(imageURLs.enumerated()), id: \.offset) { index, urlString in
-                    AsyncImage(url: URL(string: urlString)) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .onTapGesture { showFullScreen = true }
-                        case .failure:
-                            placeholder
-                        case .empty:
-                            ZStack {
-                                VybeColors.surfaceHover
-                                ProgressView()
-                                    .tint(VybeColors.accent)
+            GeometryReader { proxy in
+                let pageWidth = proxy.size.width
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: 0) {
+                        ForEach(Array(imageURLs.enumerated()), id: \.offset) { index, urlString in
+                            AsyncImage(url: URL(string: urlString)) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: pageWidth, height: 340)
+                                        .clipped()
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { showFullScreen = true }
+                                case .failure:
+                                    placeholder
+                                        .frame(width: pageWidth, height: 340)
+                                case .empty:
+                                    ZStack {
+                                        VybeColors.surfaceHover
+                                        ProgressView()
+                                            .tint(VybeColors.accent)
+                                    }
+                                    .frame(width: pageWidth, height: 340)
+                                @unknown default:
+                                    placeholder
+                                        .frame(width: pageWidth, height: 340)
+                                }
                             }
-                        @unknown default:
-                            placeholder
+                            .id(index)
                         }
                     }
-                    .tag(index)
+                    .scrollTargetLayout()
                 }
+                .scrollTargetBehavior(.paging)
+                .scrollPosition(id: Binding(
+                    get: { currentIndex },
+                    set: { if let val = $0 { currentIndex = val } }
+                ))
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
             .frame(height: 340)
-            .clipped()
 
             // Custom page indicator
             if imageURLs.count > 1 {

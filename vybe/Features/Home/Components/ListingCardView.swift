@@ -13,6 +13,7 @@ struct ListingCardView: View {
             // Image Section
             ZStack(alignment: .topTrailing) {
                 imageView
+                    .frame(maxWidth: .infinity)
                     .frame(height: 180)
                     .clipped()
 
@@ -136,6 +137,7 @@ struct ListingCardView: View {
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
+                        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                         .opacity(imageLoaded ? 1 : 0)
                         .onAppear {
                             withAnimation(.easeIn(duration: 0.3)) {

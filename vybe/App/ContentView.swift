@@ -74,24 +74,63 @@ struct ContentView: View {
     @ViewBuilder
     private func destinationView(for route: Route) -> some View {
         switch route {
+        // Listings
         case .listingDetail(let id):
             ListingDetailView(listingID: id)
         case .createListing:
             CreateListingView()
+        case .editListing:
+            CreateListingView()
+
+        // User
         case .profile(let userID):
             ProfileView(userID: userID)
+        case .editProfile:
+            EditProfileView()
+
+        // Chat
         case .chatDetail(let conversationID):
             ChatDetailView(conversationID: conversationID)
-        case .searchResults(let query):
-            SearchView(initialQuery: query)
-        case .communityDetail(let id):
-            CommunitiesView(highlightedCommunityID: id)
-        default:
-            Text("Coming Soon")
+        case .newChat(let userID, let listingID):
+            ChatDetailView(newChatUserID: userID, listingID: listingID)
+
+        // Offers
+        case .offerDetail:
+            Text("Offer Detail")
                 .font(VybeTypography.heading2)
                 .foregroundStyle(VybeColors.foreground)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(VybeColors.background)
+        case .makeOffer(let listingID):
+            ListingDetailView(listingID: listingID)
+
+        // Auth
+        case .login:
+            LoginView()
+        case .signup:
+            LoginView()
+        case .otpVerification:
+            LoginView()
+
+        // Communities
+        case .communityDetail(let id):
+            CommunitiesView(highlightedCommunityID: id)
+
+        // Search
+        case .searchResults(let query):
+            SearchView(initialQuery: query)
+        case .categoryResults(let category):
+            SearchView(initialQuery: category)
+
+        // Settings
+        case .settings:
+            SettingsView()
+        case .notificationSettings:
+            NotificationSettingsView()
+        case .privacySettings:
+            PrivacySettingsView()
+        case .about:
+            AboutView()
         }
     }
 

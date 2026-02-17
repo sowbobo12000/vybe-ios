@@ -81,14 +81,13 @@ struct HomeView: View {
     private var listingGrid: some View {
         LazyVGrid(columns: columns, spacing: VybeSpacing.gridSpacing) {
             ForEach(Array(viewModel.listings.enumerated()), id: \.element.id) { index, listing in
-                Button {
-                    router.navigate(to: .listingDetail(id: listing.id))
-                } label: {
-                    ListingCardView(listing: listing) {
-                        viewModel.toggleLike(for: listing.id)
-                    }
+                ListingCardView(listing: listing) {
+                    viewModel.toggleLike(for: listing.id)
                 }
-                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    router.navigate(to: .listingDetail(id: listing.id))
+                }
                 .scrollReveal(delay: Double(index) * 0.05)
             }
         }
@@ -151,7 +150,7 @@ struct HomeView: View {
             Spacer()
 
             Button("See All") {
-                // Navigate to full listing view
+                router.navigateToTab(.search)
             }
             .font(VybeTypography.labelMedium)
             .foregroundStyle(VybeColors.accent)

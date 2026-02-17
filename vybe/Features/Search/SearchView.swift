@@ -147,12 +147,11 @@ struct SearchView: View {
             } else {
                 LazyVGrid(columns: columns, spacing: VybeSpacing.gridSpacing) {
                     ForEach(viewModel.results) { listing in
-                        Button {
-                            router.navigate(to: .listingDetail(id: listing.id))
-                        } label: {
-                            ListingCardView(listing: listing)
-                        }
-                        .buttonStyle(.plain)
+                        ListingCardView(listing: listing)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                router.navigate(to: .listingDetail(id: listing.id))
+                            }
                     }
                 }
                 .padding(.horizontal, VybeSpacing.screenHorizontal)

@@ -3,6 +3,21 @@ import SwiftUI
 /// Real-time chat screen with message bubbles and listing context header.
 struct ChatDetailView: View {
     let conversationID: String
+    private var newChatUserID: String?
+    private var newChatListingID: String?
+
+    init(conversationID: String) {
+        self.conversationID = conversationID
+    }
+
+    /// Create a new chat with a specific user, optionally about a listing.
+    init(newChatUserID: String, listingID: String?) {
+        // Try to find existing conversation with this user, or create a placeholder ID
+        let existing = MockData.conversations.first { $0.otherUser.id == newChatUserID }
+        self.conversationID = existing?.id ?? "new-\(newChatUserID)"
+        self.newChatUserID = newChatUserID
+        self.newChatListingID = listingID
+    }
 
     @Environment(AppRouter.self) private var router
     @State private var messages: [Message] = []
@@ -162,6 +177,27 @@ struct ChatDetailView: View {
     private func loadData() {
         conversation = MockData.conversations.first { $0.id == conversationID }
         messages = MockData.messages.filter { $0.conversationID == conversationID }
+
+        // Handle new chat case — create a placeholder conversation
+        if conversation == nil, let userID = newChatUserID {
+            let user = MockData.users.first { $0.id == userID } ?? UserSummary(
+                id: userID, username: "user", displayName: "User"
+            )
+            var listingTitle: String?
+            var listingPrice: Int?
+            if let lid = newChatListingID, let listing = MockData.listings.first(where: { $0.id == lid }) {
+                listingTitle = listing.title
+                listingPrice = listing.price
+            }
+            conversation = Conversation(
+                id: conversationID,
+                participantIDs: ["current-user-id", userID],
+                otherUser: user,
+                listingID: newChatListingID,
+                listingTitle: listingTitle,
+                listingPrice: listingPrice
+            )
+        }
     }
 
     private func sendMessage() {
